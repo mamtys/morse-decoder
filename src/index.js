@@ -1,45 +1,40 @@
-const MORSE_TABLE = {
-    '.-':     'a',
-    '-...':   'b',
-    '-.-.':   'c',
-    '-..':    'd',
-    '.':      'e',
-    '..-.':   'f',
-    '--.':    'g',
-    '....':   'h',
-    '..':     'i',
-    '.---':   'j',
-    '-.-':    'k',
-    '.-..':   'l',
-    '--':     'm',
-    '-.':     'n',
-    '---':    'o',
-    '.--.':   'p',
-    '--.-':   'q',
-    '.-.':    'r',
-    '...':    's',
-    '-':      't',
-    '..-':    'u',
-    '...-':   'v',
-    '.--':    'w',
-    '-..-':   'x',
-    '-.--':   'y',
-    '--..':   'z',
-    '.----':  '1',
-    '..---':  '2',
-    '...--':  '3',
-    '....-':  '4',
-    '.....':  '5',
-    '-....':  '6',
-    '--...':  '7',
-    '---..':  '8',
-    '----.':  '9',
-    '-----':  '0',
-};
+const {
+    MORSE_SYMBOL_TABLE,
+    MORSE_TABLE,
+    SPECIAL_CHARACTERS
+} = require('./config');
+
 
 function decode(expr) {
-    // write your solution here
+    let decoded = '';
+    for (let i = 0; i < expr.length - 9; i += 10) {
+        let encodedChar = expr.slice(i, i + 10);
+
+        if (encodedChar in SPECIAL_CHARACTERS) {
+            console.log(encodedChar, SPECIAL_CHARACTERS[encodedChar])
+            decoded += SPECIAL_CHARACTERS[encodedChar];
+            continue;
+        }
+
+        const regExpString = Object.keys(MORSE_SYMBOL_TABLE)
+            .map(el => '(' + String(el) + ')|')
+            .join('')
+            .slice(0, -1)
+        const regExp = new RegExp(regExpString, 'g');
+
+
+        const morseChar = encodedChar.replace(regExp, (match, ...groups) =>
+            //slice to remove index and input arguments
+            groups.slice(0, -2).reduce((acc, curr) =>
+                acc += MORSE_SYMBOL_TABLE[curr] || '',
+                ''
+            )
+        )
+        decoded += MORSE_TABLE[morseChar];
+    }
+    return decoded;
 }
+
 
 module.exports = {
     decode
